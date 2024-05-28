@@ -78,13 +78,13 @@ function shuffle(array) {
   // While there remain elements to shuffle...
   while (currentIndex != 0) {
 
-    // Pick a remaining element...
-    randomIndex = Math.floor(Math.random() * currentIndex);
-    currentIndex--;
+	// Pick a remaining element...
+	randomIndex = Math.floor(Math.random() * currentIndex);
+	currentIndex--;
 
-    // And swap it with the current element.
-    [array[currentIndex], array[randomIndex]] = [
-      array[randomIndex], array[currentIndex]];
+	// And swap it with the current element.
+	[array[currentIndex], array[randomIndex]] = [
+	  array[randomIndex], array[currentIndex]];
   }
 
   return array;
@@ -365,6 +365,22 @@ function testPerformance() {
 	return Math.round(di * 1000) / 1000;
 }
 
+function testLowPerformance(threshold=0.1) {
+	// const threshold = 0.1; // test this
+	let average = 0.01; // high performance
+	const perf = [];
+	console.groupCollapsed('perf test')
+	for (let i = 0; i < 5; i++) {
+		perf.push(testPerformance());
+	}
+	average = perf.reduce((a, b) => (a + b)) / perf.length;
+	console.log('perf avg', average); 
+	console.groupEnd('perf test');
+	return average > threshold; // true means low performance
+}
+
+
+
 /* ascii key mapping */
 const keys = {
 	"9":   "tab",
@@ -432,4 +448,4 @@ const tileMap = [
 	16, 20, 84, 80, 219, 92, 116, 87, 28, 125, 124, 112,
 ];
 
-export { getDate, map, padNumber, random, randomInt, chance, choice, shuffle, randomNormalInverse, componentToHex, HueToRgb, hslToHex, hexToRgb, rgbToHsl, rgb2hex, Vector, mobilecheck, testPerformance, keys, tileMap, randInt };
+export { getDate, map, padNumber, random, randomInt, chance, choice, shuffle, randomNormalInverse, componentToHex, HueToRgb, hslToHex, hexToRgb, rgbToHsl, rgb2hex, Vector, mobilecheck, testPerformance, testLowPerformance, keys, tileMap, randInt };
