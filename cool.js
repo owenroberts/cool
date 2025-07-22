@@ -484,43 +484,57 @@ function CounterSequence(sequence=[]) {
 }
 
 /**
- * simple sequencer - add callbacks and call them in sequence
+ * simple sequencer
+ * call functions in sequence
  */
-function Sequencer() {
-	
-	let sequence = [];
-	let isOver = false;
-
-	/**
-	 * add a callback
-	 * @param {Function} callback 
-	 */
-	function add(callback) {
-		sequence.push({ callback });
+class Sequencer {
+	constructor() {
+		this.sequence = [];
+		this.index = 0;
+		this.isOver = false;
 	}
 
 	/**
-	 * go to next callback
+	 * add callback
+	 * @param {function} options.fn    callback function
+	 * @param {String} [options.label] label to find seq index, don't use "none"
 	 */
-	function next() {
-		if (sequence.length > 0) {
-			let n = sequence.shift();
-			n.callback();
-		} else if (!isOver) {
-			isOver = true;
-			console.warn('Sequence over.');
+	add({ fn, label="none" }) {
+		this.sequence.push({ fn, label });		
+	}
+
+	/**
+	 * calls function at index, increments index
+	 */
+	next() {
+		if (this.index < this.sequence.length) {
+			this.index++; // increment first to avoid stack overflow
+			this.sequence[this.index - 1].fn();
+		} else if (!this.isOver) {
+			this.isOver = true;
+			if (import.meta.env.DEV) console.warn('Sequence over.');
 		}
 	}
 
 	/**
-	 * is the sequence done?
-	 * @returns {boolean} isDone
+	 * set sequence index to match label
+	 * @param {string} label - to match
 	 */
-	function isDone() { 
-		return sequence.length === 0; 
+	set(label) {
+		console.log({label});
+		console.log(this.sequence)
+		let index = this.sequence.findIndex(e => e.label === label);
+		if (index >= 0) this.index = index;
+		else console.warn(`${label} not in sequence`);
+		console.log(this.index);
 	}
 
-	return { add, next, isDone };
+	/**
+	 * @return {boolean} seq is done
+	 */
+	isDone() {
+		return this.index === this.sequence.length - 1;
+	}
 }
 
 function CounterSequencer() {
