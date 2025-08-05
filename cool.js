@@ -259,117 +259,6 @@ function rgb2hex(orig) {
 		("0" + parseInt(rgb[3],10).toString(16)).slice(-2) : orig;
 }
 
-/* vector stuff */
-function Vector(x,y) {
-	this.x = x || 0;
-	this.y = y || 0;
-	
-	if (Array.isArray(this.x)) {
-		this.x = x[0];
-		this.y = x[1];
-	}
-
-	this.random = function(xMin, xMax, yMin, yMax) {
-		if (arguments.length == 1) {
-			this.x = random(-xMin, xMin);
-			this.y = random(-xMin, xMin);
-		} else if (arguments.length == 2) {
-			this.x = random(xMin, xMax);
-			this.y = random(xMin, xMax);
-		} else if (arguments.length == 4) {
-			this.x = random(xMin, xMax);
-			this.y = random(yMin, yMax);
-		} else {
-			console.error('You need 1, 2 or 4 arguments, dingus.');
-		}
-		return this;
-	};
-
-	this.zero = function() {
-		if ( Math.abs(this.x) > 0 || Math.abs(this.y) > 0 ) return false;
-		else return true;
-	};
-
-	this.add = function(v) {
-		this.x += v.x;
-		this.y += v.y;
-		return this;
-	};
-
-	this.subtract = function(v) {
-		this.x -= v.x;
-		this.y -= v.y;
-		return this;
-	};
-
-	this.multiply = function(n) {
-		if (typeof n === 'object') {
-			this.x *= n.x;
-			this.y *= n.y;
-		} else {
-			this.x *= n;
-			this.y *= n;
-		}
-		return this;
-	};
-
-	this.divide = function(n) {
-		if (typeof n == 'object') {
-			this.x /= n.x;
-			this.y /= n.y;
-		} else {
-			this.x /= n;
-			this.y /= n;
-		}
-		return this;
-	};
-
-	this.magnitude = function() {
-		return Math.sqrt(this.x*this.x + this.y*this.y);
-	};
-	
-	this.normalize = function() {
-		var m = this.magnitude();
-		if (m != 0 && m != 1) this.divide(m);
-		return this;
-	};
-
-	this.copy = function() {
-		return new Vector(this.x, this.y);
-	};
-
-	this.distance = function(v) {
-		var d = new Vector(v.x, v.y);
-		d.subtract(this);
-		return d.magnitude();
-	};
-
-	this.round = function() {
-		this.x = Math.round(this.x);
-		this.y = Math.round(this.y);
-		return this;
-	};
-
-	this.getObj = function() {
-		return { x: this.x, y: this.y };
-	};
-
-	this.clone = function() {
-		return new Vector(this.x, this.y);
-	};
-
-	this.sameDirection = function(v) {
-		return Math.sign(this.x) == Math.sign(v.x) &&
-			Math.sign(this.y) == Math.sign(v.y);
-	};
-
-	this.toArray = function() {
-		return [this.x, this.y];
-	};
-
-	return this;
-};
-
 /* browser stuff */
 function testPerformance() {
 	// https://stackoverflow.com/questions/19754792/measure-cpu-performance-via-js
@@ -407,80 +296,64 @@ function testLowPerformance(threshold=0.1) {
 	return average > threshold; // true means low performance
 }
 
-// should be a class (or createCounter)
 /**
- * A counter for counting
- * setLoop(true) to loop
- * @param {Number}   duration (in frames)
- * @param {Function} callback (callback on end);
- * @return {Object} update, reset, isDone(), setLoop(), end(), getProgress(), getCount(), setCount(), getDuration(), setDuration()
+ * a counter for counting
+ * set isLoop, duration, count
  */
-function Counter(duration=24, callback) {
-
-	let count = 0;
-	let loop = false;
-	let isDone = false;
+class Counter {
 
 	/**
-	 * count up by one
-	 * @param  {Number} timeMod should change this to like pass params or something
+	 * creates a counter
+	 * @param  {number}   duration 
+	 * @param  {function} callback
 	 */
-	function update(timeMod=1) {
-		if (count >= duration) {
-			if (!isDone && callback) callback(timeMod);
-			if (loop) {
-				reset();
+	constructor(duration=24, callback) {
+		this.duration = duration;
+		this.count = 0;
+		this.isLoop = false;
+		this.isDone = false;
+		this.callback = callback;
+	}
+
+	/**
+	 * count up by one and check if done
+	 * @returns {number} current count
+	 */
+	update() {
+		if (this.count >= this.duration) {
+			if (!this.isDone && this.callback) this.callback();
+			if (this.isLoop) {
+				this.reset();
 			} else {
-				isDone = true;
+				this.isDone = true;
 			}
 		} else {
-			count = count + 1;
+			this.count = this.count + 1;
 		}
-		return count;
+		return this.count;
 	}
 
 	/**
 	 * reset the count to 0
 	 */
-	function reset() {
-		count = 0;
+	reset() {
+		this.count = 0;
+		this.isDone = false;
 	}
 
-	return {
-		update, reset,
-		setLoop: value => { loop = value; },
-		isDone: () => { return count >= duration; },
-		end: () => { count = duration; },
-		getProgress: () => { return count / duration },
-		getCount: () => { return count; },
-		setCount: value => { count = value; },
-		getDuration: () => { return duration; },
-		setDuration: value => { duration = value; },
-	};
-}
-
-function CounterSequence(sequence=[]) {
-
-	function add(duration, loop, callback) {
-		sequence.push(Counter(duration, loop, callback));
+	/**
+	 * set the counter to the end duration
+	 */
+	end() {
+		this.count = this.duration;
 	}
 
-	function next() {
-		sequence.shift();
+	/**
+	 * @returns {number} progress 0 - 1 scale
+	 */
+	getProgress() {
+		return this.count / this.duration;
 	}
-
-	function update(timeMod) {
-		if (sequence.length < 1) return;
-		sequence[0].update(timeMod);
-		if (sequence.length < 1) return;
-		if (sequence[0].isDone()) return next();
-	}
-
-	function stop() {
-		sequence = [];
-	}
-
-	return { add, update, next, stop };
 }
 
 /**
@@ -521,12 +394,9 @@ class Sequencer {
 	 * @param {string} label - to match
 	 */
 	set(label) {
-		console.log({label});
-		console.log(this.sequence)
 		let index = this.sequence.findIndex(e => e.label === label);
 		if (index >= 0) this.index = index;
 		else console.warn(`${label} not in sequence`);
-		console.log(this.index);
 	}
 
 	/**
@@ -536,6 +406,32 @@ class Sequencer {
 		return this.index === this.sequence.length - 1;
 	}
 }
+
+
+function CounterSequence(sequence=[]) {
+
+	function add(duration, loop, callback) {
+		sequence.push(Counter(duration, loop, callback));
+	}
+
+	function next() {
+		sequence.shift();
+	}
+
+	function update(timeMod) {
+		if (sequence.length < 1) return;
+		sequence[0].update(timeMod);
+		if (sequence.length < 1) return;
+		if (sequence[0].isDone()) return next();
+	}
+
+	function stop() {
+		sequence = [];
+	}
+
+	return { add, update, next, stop };
+}
+
 
 function CounterSequencer() {
 	let sequence = [];
@@ -568,10 +464,10 @@ function CounterSequencer() {
 
 
 /**
- * ascii key map
- * @type {Object}
+ * ascii key map - compare to ev.which
+ * @type {object}
  */
-const keys = {
+const whichKeyMap = {
 	"9": "tab",
 	"13": "enter",
 	"27": "escape",
@@ -640,4 +536,4 @@ function mobilecheck() {
 }
 
 
-export { getDate, map, padNumber, random, randomInt, chance, coinFlip, choice, shuffle, randomNormalInverse, componentToHex, HueToRgb, hslToHex, hexToRgb, rgbToHsl, rgb2hex, Vector, mobilecheck, testPerformance, testLowPerformance, keys, randInt, Counter, Sequencer, CounterSequence, assert };
+export { getDate, map, padNumber, random, randomInt, chance, coinFlip, choice, shuffle, randomNormalInverse, componentToHex, HueToRgb, hslToHex, hexToRgb, rgbToHsl, rgb2hex, mobilecheck, testPerformance, testLowPerformance, whichKeyMap, randInt, Counter, Sequencer, CounterSequence, assert };
