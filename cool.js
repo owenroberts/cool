@@ -296,6 +296,12 @@ function testLowPerformance(threshold=0.1) {
 	return average > threshold; // true means low performance
 }
 
+function getPointDistance(p1, p2) {
+	const a = p1[0] - p2[0];
+	const b = p1[1] - p2[1];
+	return Math.sqrt(a * a + b * b);
+}
+
 /**
  * a counter for counting
  * set isLoop, duration, count
@@ -536,4 +542,4 @@ function mobilecheck() {
 }
 
 
-export { getDate, map, padNumber, random, randomInt, chance, coinFlip, choice, shuffle, randomNormalInverse, componentToHex, HueToRgb, hslToHex, hexToRgb, rgbToHsl, rgb2hex, mobilecheck, testPerformance, testLowPerformance, whichKeyMap, randInt, Counter, Sequencer, CounterSequence, assert };
+export { getPointDistance, getDate, map, padNumber, random, randomInt, chance, coinFlip, choice, shuffle, randomNormalInverse, componentToHex, HueToRgb, hslToHex, hexToRgb, rgbToHsl, rgb2hex, mobilecheck, testPerformance, testLowPerformance, whichKeyMap, randInt, Counter, Sequencer, CounterSequence, assert };
