@@ -135,6 +135,14 @@ function randomNormalInverse() {
 	return m > 0.5 ? m - 0.5 : m + 0.5; /* invert range */
 }
 
+// https://stackoverflow.com/questions/9553354/how-do-i-get-the-decimal-places-of-a-floating-point-number-in-javascript
+function getNumberPrecision(a) {
+	assert(isFinite(a), `use a valid number, ${a}`)
+	var e = 1, p = 0;
+	while (Math.round(a * e) / e !== a) { e *= 10; p++; }
+	return p;
+}
+
 /* converting color values 
 http://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb
 https://gist.github.com/kig/2115205 // hslToHex
@@ -541,5 +549,4 @@ function mobilecheck() {
 	return check;
 }
 
-
-export { getPointDistance, getDate, map, padNumber, random, randomInt, chance, coinFlip, choice, shuffle, randomNormalInverse, componentToHex, HueToRgb, hslToHex, hexToRgb, rgbToHsl, rgb2hex, mobilecheck, testPerformance, testLowPerformance, whichKeyMap, randInt, Counter, Sequencer, CounterSequence, assert };
+export { getPointDistance, getDate, map, padNumber, random, randomInt, chance, coinFlip, choice, shuffle, randomNormalInverse, componentToHex, HueToRgb, hslToHex, hexToRgb, rgbToHsl, rgb2hex, mobilecheck, testPerformance, testLowPerformance, whichKeyMap, randInt, Counter, Sequencer, CounterSequence, assert, getNumberPrecision };
