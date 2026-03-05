@@ -56,6 +56,10 @@ export function getDate() {
 	return new Date().toDateString().replace(/ /g, '-');
 }
 
+export function getNumberDate() {
+	return new Date().toLocaleDateString().replace(/\//g, '-');
+}
+
 export function map(value, low1, high1, low2, high2, clamp) {
 	let v = low2 + (high2 - low2) * (value - low1) / (high1 - low1) || 0;
 	return clamp ? v.clamp(low2, high2) : v;
