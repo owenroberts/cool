@@ -362,9 +362,9 @@ export class Counter {
 	 * count up by one and check if done
 	 * @returns {number} current count
 	 */
-	update() {
+	update(time) {
 		if (this.count >= this.duration) {
-			if (!this.isDone && this.callback) this.callback();
+			if (!this.isDone && this.callback) this.callback(time);
 			if (this.isLoop) {
 				this.reset();
 			} else {
@@ -454,7 +454,9 @@ export class Sequencer {
 export function CounterSequence(sequence=[]) {
 
 	function add(duration, loop, callback) {
-		sequence.push(Counter(duration, loop, callback));
+		const counter = new Counter(duration, callback);
+		counter.isLoop = loop; 
+		sequence.push(counter);
 	}
 
 	function next() {
@@ -465,7 +467,7 @@ export function CounterSequence(sequence=[]) {
 		if (sequence.length < 1) return;
 		sequence[0].update(timeMod);
 		if (sequence.length < 1) return;
-		if (sequence[0].isDone()) return next();
+		if (sequence[0].isDone) return next();
 	}
 
 	function stop() {
