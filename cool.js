@@ -37,6 +37,18 @@ export function assert(condition, message) {
 	}
 }
 
+// fuck how to keep line numbers .... 
+export function log() {
+	console.log.bind(console, ...arguments);
+}
+
+export function strLog() {
+	for (let i = 0; i < arguments.length; i++) {
+		if (typeof arguments[i] === "object") console.log.bind(console, JSON.stringify(arguments[i]));
+		else console.log.bind(console, arguments[i]);
+	} 
+}
+
 /**
  * define props that can't be assigned
  * avoid errors from obj refs

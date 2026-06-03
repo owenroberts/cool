@@ -1,0 +1,21 @@
+{
+	"name": "@b/cool",
+	"version": "1.0.0",
+	"description": "helpers",
+	"homepage": "https://github.com/owenroberts/cool#readme",
+	"bugs": {
+		"url": "https://github.com/owenroberts/cool/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/owenroberts/cool.git"
+	},
+	"license": "ISC",
+	"author": "owenribbit",
+	"type": "module",
+	"main": "cool.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"devDependencies": {}
+}
