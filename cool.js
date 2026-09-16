@@ -24,6 +24,24 @@ if (typeof window !== 'undefined') {
 	})();
 }
 
+// https://dmitripavlutin.com/javascript-enum/#4-enum-based-on-a-proxy
+export function Enum(baseEnum) {
+	return new Proxy(baseEnum, {
+		get(target, name) {
+			if (!baseEnum.hasOwnProperty(name)) {
+				console.log(baseEnum);
+				throw new Error(`${name} value does not exist`);
+			}
+			return baseEnum[name];
+		},
+		set(target, name, value) {
+			throw new Error("cannot add value to enum");
+		}
+	});
+}
+
+export const alphabet = "abcdefghijklmnopqrstuvwxyz";
+
 /**
  * throw error if assertion is false in dev mode
  * tied to vite environment
@@ -106,6 +124,10 @@ export function randomInt(min, max, maxInclusive=true) {
 	return maxInclusive ? 
 		Math.round(Math.random() * (max - min) + min) :
 		Math.floor(Math.random() * (max - min) + min);
+}
+
+export function balancedRandom(value, factor=0) {
+	return value - factor * value + random(factor) * value * 2;
 }
 
 export const randInt = randomInt;
@@ -461,64 +483,6 @@ export class Sequencer {
 		return this.index === this.sequence.length - 1;
 	}
 }
-
-
-export function CounterSequence(sequence=[]) {
-
-	function add(duration, loop, callback) {
-		const counter = new Counter(duration, callback);
-		counter.isLoop = loop; 
-		sequence.push(counter);
-	}
-
-	function next() {
-		sequence.shift();
-	}
-
-	function update(timeMod) {
-		if (sequence.length < 1) return;
-		sequence[0].update(timeMod);
-		if (sequence.length < 1) return;
-		if (sequence[0].isDone) return next();
-	}
-
-	function stop() {
-		sequence = [];
-	}
-
-	return { add, update, next, stop };
-}
-
-
-export function CounterSequencer() {
-	let sequence = [];
-	let counter = Counter();
-
-	function add(duration=24, callback) {
-		sequence.push({ duration, callback });
-	}
-
-	function next() {
-		sequence.shift();
-		counter.reset();
-		counter.setDuration(sequence[0].duration);
-	}
-
-	function update() {
-		counter.update();
-		if (counter.isDone()) {
-			if (sequence.length > 0) {
-				next();
-			}
-		}
-	}
-
-	return {
-		add, next, update,
-		isDone: () => { return sequence.length === 0; },
-	};
-}
-
 
 /**
  * ascii key map - compare to ev.which
